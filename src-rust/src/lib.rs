@@ -333,7 +333,7 @@ pub unsafe extern "C" fn pty_resize(this: *mut Pty, size: *mut i8, result: *mut 
 pub unsafe extern "C" fn pty_close(this: *mut Pty) {
     // NOTE: Dropping the pty doensn't work on windows and trigger random bugs https://github.com/sigmaSd/deno-pty-ffi/issues/3
     if cfg!(windows) {
-        let _this = ManuallyDrop::new(Box::from_raw(this));
+        let _this = Box::from_raw(this);
         // killing doesn't work https://github.com/wez/wezterm/issues/5107
         // let _ = this.ck.kill();
     } else {

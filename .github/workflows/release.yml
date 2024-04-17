@@ -36,6 +36,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: goto-bus-stop/setup-zig@v2
+    - run: |
+      cargo install cargo-zigbuild
+      rustup target add ${{ matrix.target }}
 
     - uses: dtolnay/rust-toolchain@stable
       with:
@@ -46,8 +50,7 @@ jobs:
  
     - name: Build Binary
       run: |
-        rustup target add ${{ matrix.target }}
-        cargo build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
+        cargo zigbuild --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
 
     - name: Correct MacOS lib name
       if: matrix.os == 'macos'

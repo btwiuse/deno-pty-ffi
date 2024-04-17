@@ -73,7 +73,7 @@ jobs:
       if: matrix.os == 'windows'
       run: |
         echo ${{ matrix.os }}
-        mv "src-rust/target/${{ matrix.target }}/release/libdeno_pty.dll" deno_pty.dll
+        mv "src-rust/target/${{ matrix.target }}/release/deno_pty.dll" deno_pty.dll
 
     - name: Upload MacOS lib
       if: matrix.os == 'macos'

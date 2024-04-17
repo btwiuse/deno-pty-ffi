@@ -19,27 +19,27 @@ jobs:
             runner: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             os: linux
-            command: cargo
+            build: zigbuild
           - name: linux-arm64
             runner: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             os: linux
-            command: cross
+            build: zigbuild
           - name: win-amd64
             runner: windows-latest
             target: x86_64-pc-windows-msvc
             os: windows
-            command: cargo
+            build: build
           - name: macos-amd64
             runner: macos-latest
             target: x86_64-apple-darwin
             os: macos
-            command: cargo
+            build: zigbuild
           - name: macos-arm64
             runner: macos-14
             target: aarch64-apple-darwin
             os: macos
-            command: cargo
+            build: zigbuild
 
     steps:
     - uses: actions/checkout@v3
@@ -52,37 +52,33 @@ jobs:
     - name: Setup Cache
       uses: Swatinem/rust-cache@v2
 
-    # Only install cross if we need it
-    # Install via cargo-binstall which I found faster
-    - name: Install Cross
-      if: matrix.command == 'cross'
+    - name: Install cargo-zigbuild
       shell: bash
       run: |
         curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-        cargo binstall --no-confirm cross
+        cargo binstall --no-confirm cargo-zigbuild
 
     - name: Build Binary
-      if: matrix.os != 'linux-arm64'
       run: |
-        ${{ matrix.command }} build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
+        cargo ${{ matrix.build }} --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
 
     - name: Correct MacOS lib name
       if: matrix.os == 'macos'
       run: |
         echo ${{ matrix.os }}
-        mv "src-rust/target/${{ matrix.target }}/release/libpty.dylib" libpty_$(uname -m).dylib
+        mv "src-rust/target/release/libpty.dylib" libpty_$(uname -m).dylib
 
     - name: Correct Linux lib name
       if: matrix.os == 'linux'
       run: |
         echo ${{ matrix.os }}
-        mv "src-rust/target/${{ matrix.target }}/release/libpty.so" libpty_$(uname -m).so
+        mv "src-rust/target/release/libpty.so" libpty_$(uname -m).so
 
     - name: Correct Windows lib name
       if: matrix.os == 'windows'
       run: |
         echo ${{ matrix.os }}
-        mv "src-rust/target/${{ matrix.target }}/release/pty.dll" pty.dll
+        mv "src-rust/target/release/pty.dll" pty.dll
 
     - name: Upload MacOS lib
       if: matrix.os == 'macos'

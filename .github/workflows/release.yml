@@ -2,6 +2,8 @@ name: Release libs
 
 on:
   push:
+   tags:
+     - '*'
 
 permissions:
   contents: write

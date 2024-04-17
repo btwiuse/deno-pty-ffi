@@ -55,7 +55,7 @@ const SYMBOLS = {
 export async function instantiate(): Promise<
   Deno.DynamicLibrary<typeof SYMBOLS>
 > {
-  const name = "pty";
+  const name = "deno_pty";
   const url =
     `https://github.com/btwiuse/deno-pty-ffi/releases/download/${version}`;
 

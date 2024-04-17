@@ -19,22 +19,27 @@ jobs:
             runner: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             os: linux
+            command: cargo
           - name: linux-arm64
             runner: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             os: linux
+            command: cross
           - name: win-amd64
             runner: windows-latest
             target: x86_64-pc-windows-msvc
             os: windows
+            command: cargo
           - name: macos-amd64
             runner: macos-latest
             target: x86_64-apple-darwin
             os: macos
+            command: cargo
           - name: macos-arm64
             runner: macos-14
             target: aarch64-apple-darwin
             os: macos
+            command: cargo
 
     steps:
     - uses: actions/checkout@v3
@@ -46,17 +51,20 @@ jobs:
 
     - name: Setup Cache
       uses: Swatinem/rust-cache@v2
- 
-    - name: Build Binary (zigbuild)
-      if: matrix.name == 'linux-arm64'
+
+    # Only install cross if we need it
+    # Install via cargo-binstall which I found faster
+    - name: Install Cross
+      if: matrix.command == 'cross'
+      shell: bash
       run: |
-        cargo install cargo-zigbuild
-        cargo zigbuild --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+        cargo binstall --no-confirm cross
 
     - name: Build Binary
       if: matrix.os != 'linux-arm64'
       run: |
-        cargo build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
+        ${{ matrix.command }} build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
 
     - name: Correct MacOS lib name
       if: matrix.os == 'macos'

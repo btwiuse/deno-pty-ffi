@@ -1,6 +1,6 @@
 [package]
-name = "pty"
-version = "0.1.0"
+name = "deno_pty"
+version = "0.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,11 +9,12 @@ edition = "2021"
 strip = true  # Automatically strip symbols from the binary.
 
 [dependencies]
-crossbeam = { version = "0.8.2", features = ["crossbeam-channel"] }
+crossbeam = { version = "0.8", features = ["crossbeam-channel"] }
 parking_lot = "0.12.1"
 portable-pty = { version = "0.8.1", features = ["serde_support"] }
-serde = { version = "1.0.164", features = ["derive"] }
-serde_json = "1.0.99"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+proc-macro2 = "=1.0.79"
 
 [lib]
 crate-type = ["cdylib"]

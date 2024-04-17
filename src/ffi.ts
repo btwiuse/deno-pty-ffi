@@ -57,7 +57,7 @@ export async function instantiate(): Promise<
 > {
   const name = "pty";
   const url =
-    `https://github.com/sigmaSd/deno-pty-ffi/releases/download/${version}`;
+    `https://github.com/btwiuse/deno-pty-ffi/releases/download/${version}`;
 
   return await plug.dlopen(
     {
@@ -66,6 +66,10 @@ export async function instantiate(): Promise<
       // reload cache if developping locally
       cache: Deno.env.get("RUST_LIB_PATH") ? "reloadAll" : "use",
       suffixes: {
+        linux: {
+          aarch64: "_arm64",
+          x86_64: "_x86_64",
+        },
         darwin: {
           aarch64: "_arm64",
           x86_64: "_x86_64",

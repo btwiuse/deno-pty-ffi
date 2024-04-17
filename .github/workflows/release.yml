@@ -11,31 +11,61 @@ permissions:
 jobs:
   build:
     name: Release libs
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-14]
+        include:
+          - name: linux-amd64
+            runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            os: linux
+          - name: linux-arm64
+            runner: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            os: linux
+          - name: win-amd64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            os: windows
+          - name: macos-amd64
+            runner: macos-latest
+            target: x86_64-apple-darwin
+            os: macos
+          - name: macos-arm64
+            runner: macos-14
+            target: aarch64-apple-darwin
+            os: macos
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - uses: actions-rs/toolchain@v1
+    - uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: stable
+        targets: ${{ matrix.target }}
 
-    - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --release --manifest-path src-rust/Cargo.toml
+    - name: Setup Cache
+      uses: Swatinem/rust-cache@v2
+ 
+    - name: Build Binary
+      run: cargo build --verbose --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
 
     - name: Correct MacOS lib name
-      if: runner.os == 'MacOS'
+      if: ${{ matrix.os }}  == 'macos'
       run: |
-        mv src-rust/target/release/libpty.dylib libpty_$(uname -m).dylib
+        mv "src-rust/target/${{ matrix.target }}/release/libpty.dylib" libpty_$(uname -m).dylib
+
+    - name: Correct Linux lib name
+      if: ${{ matrix.os }}  == 'linux'
+      run: |
+        mv "src-rust/target/${{ matrix.target }}/release/libpty.so" libpty_$(uname -m).so
+
+    - name: Correct Windows lib name
+      if: ${{ matrix.os }}  == 'windows'
+      run: |
+        mv "src-rust/target/${{ matrix.target }}/release/pty.dll" pty.dll
 
     - name: Upload MacOS lib
-      if: runner.os == 'MacOS'
+      if: ${{ matrix.os }}  == 'macos'
       uses: svenstaro/upload-release-action@v2
       with:
         file: libpty_*.dylib
@@ -44,17 +74,19 @@ jobs:
         file_glob: true
 
     - name: Upload Linux lib
-      if: runner.os == 'Linux'
+      if: ${{ matrix.os }}  == 'macos'
       uses: svenstaro/upload-release-action@v2
       with:
-        file: src-rust/target/release/libpty.so
+        file: libpty_*.so
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true
 
     - name: Upload Windows lib
       if: runner.os == 'Windows'
       uses: svenstaro/upload-release-action@v2
       with:
-        file: src-rust/target/release/pty.dll
+        file: pty.dll
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true

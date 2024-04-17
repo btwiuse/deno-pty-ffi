@@ -74,7 +74,7 @@ jobs:
         file_glob: true
 
     - name: Upload Linux lib
-      if: ${{ matrix.os }}  == 'macos'
+      if: ${{ matrix.os }}  == 'linux'
       uses: svenstaro/upload-release-action@v2
       with:
         file: libpty_*.so
@@ -83,7 +83,7 @@ jobs:
         file_glob: true
 
     - name: Upload Windows lib
-      if: runner.os == 'Windows'
+      if: ${{ matrix.os }} == 'windows'
       uses: svenstaro/upload-release-action@v2
       with:
         file: pty.dll

@@ -68,11 +68,11 @@ export async function instantiate(): Promise<
       suffixes: {
         linux: {
           aarch64: "_arm64",
-          x86_64: "_x86_64",
+          x86_64: "_amd64",
         },
         darwin: {
           aarch64: "_arm64",
-          x86_64: "_x86_64",
+          x86_64: "_amd64",
         },
       },
     },

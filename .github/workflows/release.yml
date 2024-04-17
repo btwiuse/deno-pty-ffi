@@ -44,6 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: goto-bus-stop/setup-zig@v2
+    - uses: cargo install cargo-zigbuild
 
     - uses: dtolnay/rust-toolchain@stable
       with:
@@ -51,12 +52,6 @@ jobs:
 
     - name: Setup Cache
       uses: Swatinem/rust-cache@v2
-
-    - name: Install cargo-zigbuild
-      shell: bash
-      run: |
-        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-        cargo binstall --no-confirm cargo-zigbuild
 
     - name: Build Binary
       run: |

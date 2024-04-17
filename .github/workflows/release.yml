@@ -45,7 +45,9 @@ jobs:
       uses: Swatinem/rust-cache@v2
  
     - name: Build Binary
-      run: cargo build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
+      run: |
+        rustup target add ${{ matrix.target }}
+        cargo build --release --manifest-path src-rust/Cargo.toml --target ${{ matrix.target }}
 
     - name: Correct MacOS lib name
       if: matrix.os == 'macos'
